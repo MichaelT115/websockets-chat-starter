@@ -1,0 +1,9 @@
+#chat {
+  display: block;
+  background-color: #EEEEEE;
+  width: 100%;
+  max-width: 640px;
+  height: 340px;
+  overflow-y: scroll;
+  border: solid 2px #000;
+}

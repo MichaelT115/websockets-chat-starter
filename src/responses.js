@@ -8,7 +8,7 @@ const extToType = {
   '.html': 'text/html',
   '.css': 'text/css',
   '.json': 'application/json',
-  '.js': 'text/babel',
+  '.js': 'application/javascript',
   '.xml': 'text/xml',
 };
 

@@ -70,7 +70,35 @@ const onJoined = (sock) => {
 const onMsg = (sock) => {
   const socket = sock;
   socket.on('msgToServer', (data) => {
-    io.sockets.in('room1').emit('msg', { name: socket.name, msg: data.msg, color: data.color});
+    // Replace instances of color commands with relevant html.
+    let message = data.msg || '';
+    message = message.replace(/{red}/g, "<span style='color:red'>");
+    message = message.replace(/{blue}/g, "<span style='color:blue'>");
+    message = message.replace(/{green}/g, "<span style='color:green'>");
+    message = message.replace(/{~}/g, '</span>');
+
+    // Send Message to room
+    io.sockets.in('room1').emit('msg', { name: socket.name, msg: message, color: data.color });
+  });
+};
+
+// On  buttons
+const onButtons = (sock) => {
+  const socket = sock;
+
+  // Handle roll dice event
+  socket.on('roll', () => {
+    const message = `${socket.name} rolled ${Math.floor(Math.random() * 20)} out of 20.`;
+    io.sockets.in('room1').emit('msg', { name: 'server', msg: message });
+  });
+
+  // Handle get time event
+  socket.on('time', () => {
+    const date = new Date();
+    const message = `To ${socket.name}. The time is: ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
+    // Only send to socket that requested it.
+    socket.emit('msg', { name: 'server', msg: message });
   });
 };
 
@@ -97,10 +125,11 @@ const onDisconnect = (sock) => {
 io.sockets.on('connection', (socket) => {
   console.log('started');
 
+  // Set event listeners
   onJoined(socket);
   onMsg(socket);
+  onButtons(socket);
   onDisconnect(socket);
 });
 
 console.log('Websocket server started');
-

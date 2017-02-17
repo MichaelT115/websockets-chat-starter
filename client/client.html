@@ -2,48 +2,61 @@
 <html lang="en">
 
 <head>
-  <!-- import the websocket client library. You can code websockets from scratch
-         but we will just import a library. In this case we are using socket.io which is 
-         one of the most popular and feature rich websocket libraries.
-         
-         You can point the src for the script to any host online, but
-         by default the socket.io nodejs library will host the client library
-         online at your node.js address under /socket.io/socket.io.js 
-         You can disable that on the server if desired
-    -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
     (() => {
       const connectSocket = (e) => {
+        // Gets elements of the document
         const messageInput = document.querySelector('#message');
         const chat = document.querySelector('#chat');
         const send = document.querySelector('#send');
         const colorInput = document.querySelector('#colorSelect');
+        const rollButton = document.querySelector('#roll');
+        const timeButton = document.querySelector('#time');
         
+        // Get socket
         const socket = io.connect();
         
+        // Set whats happens on Connect
         socket.on('connect', () => {
-          let user = document.querySelector('#username').value;
+          // Get user name
+          let user = document.querySelector('#username').value || 'unknown';
           
-          if (!user) {
-            user = 'unknown';
-          }
+          // Send event 'join'
+          socket.emit('join', { name: user });
           
-          socket.emit('join', { name: user }); 
+          // Disable abillity to reconnect
+          document.querySelector('#username').readOnly = true;
+          document.querySelector('#connect').disabled = true;
         });
         
+        // On recieving a message.
         socket.on('msg', (data) => {
           console.log(data);
+          
           // Handle Message
-          let message = `<div class="Server Notification" style="color:${data.color || "black"}">`;
-          message += `<em>${data.name}</em>`;
-          message += ` - ${data.msg}`;
+          let message = `<div class="message" style="color:${data.color || "black"}">`; // Creates div of specified color (default = black).
+          message += `<em>${data.name}</em>`; // States who is the sender
+          message += ` - ${data.msg}</div>`;  //Message
+          
+          // Add message to chat
           chat.innerHTML += message;
         }); 
         
+        // When click on send button, send message to server event
         send.addEventListener('click', () => {
-          socket.emit('msgToServer', { msg: messageInput.value, color: colorInput.value })
+          socket.emit('msgToServer', { msg: messageInput.value, color: colorInput.value });
+        });
+        
+        // When click on roll button, send roll event
+        rollButton.addEventListener('click', () => {
+          socket.emit('roll');
+        });
+        
+        // When click on time button, send message to time
+        timeButton.addEventListener('click', () => {
+          socket.emit('time');
         });
       };
       
@@ -55,17 +68,7 @@
       window.onload = init;
     })(window);
   </script>
-  <style>
-    #chat {
-      display: block;
-      background-color: #EEEEEE;
-      width: 100%;
-      max-width: 640px;
-      height: 340px;
-      overflow-y: scroll;
-      border: solid 2px #000;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -84,8 +87,35 @@
     <option value="green" style="color:green">green</option>
     <option value="blue" style="color:blue">blue</option>   
   </select>
+  <input id="roll" type="button" value="Roll D20" />
+  <input id="time" type="button" value="Get Time" />
 
   <div id="chat">
+  </div>
+  
+  <div>
+    <h2>Instructions:</h2>
+    <ol>
+      <li>Type in a Username and press "connect".</li>
+      <li>Type something into the "message" field then press "send".</li>
+      <li>Click on the "Message Color" dropdown menu to select a color for your message.</li>
+    </ol>
+    <h2>Extra Features:</h2>
+    <ol>
+      <li>Try rolling the die.</li>
+      <li>Try getting the time.</li>
+      <li>Try these messages:
+        <ul>
+          "Colors: {red}Red{~} {green}Green{~} {blue}Blue{~}"
+        </ul>
+        <ul>
+          "Colors: {red}Red {green}Green{~} Red{~}"
+        </ul>
+        <ul>
+          "Warning {red}DANGER!!!{~}"
+        </ul>
+      </li>
+    </ol>
   </div>
 </body>
 
