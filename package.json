@@ -1,0 +1,29 @@
+{
+  "name": "websockets-chat-starter",
+  "version": "1.0.0",
+  "description": "590 Websocket Chat Server Homework",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IGM-Real-Time-at-RIT/websockets-chat-starter.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/IGM-Real-Time-at-RIT/websockets-chat-starter/issues"
+  },
+  "homepage": "https://github.com/IGM-Real-Time-at-RIT/websockets-chat-starter#readme",
+  "devDependencies": {
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0"
+  },
+  "dependencies": {
+    "socket.io": "^1.7.2"
+  }
+}

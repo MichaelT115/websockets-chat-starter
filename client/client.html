@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <!-- import the websocket client library. You can code websockets from scratch
+	<!-- import the websocket client library. You can code websockets from scratch
          but we will just import a library. In this case we are using socket.io which is 
          one of the most popular and feature rich websocket libraries.
          
@@ -10,23 +11,72 @@
          online at your node.js address under /socket.io/socket.io.js 
          You can disable that on the server if desired
     -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		const connectSocket = (e) => {
+			const message = document.querySelector("#message");
+			const chat = document.querySelector("#chat");
+			const send = document.querySelector("#send");
+			const socket = io.connect();
+
+			socket.on('connect', () => {
+
+				let user = document.querySelector("#username").value;
+				if (!user) {
+					user = 'unknown';
+				}
+
+				socket.emit('join', { name: user });
+			});
+
+			socket.on('msg', (data) => {
+				console.log(data);
+
+
+				// Handle Message
+				const message =
+					`<p class="Server Notification">` + `<em>${data.name}</em>` + ' - ' + data.msg
+
+				chat.innerHTML += message;
+			});
+
+			send.addEventListener('click', () => {
+				socket.emit('message', { message });
+			});
+		};
+
+		const init = () => {
+			const connect = document.querySelector("#connect");
+			connect.addEventListener('click', connectSocket);
+		};
+
+		window.onload = init;
+	</script>
 	<style>
-		textarea {
+		#chat {
 			display: block;
 			background-color: #EEEEEE;
+			width: 100%;
+			max-width: 640px;
+			height: 340px;
+			overflow-y: scroll;
+			border: solid 2px #000;
 		}
 	</style>
 </head>
+
 <body>
 	<label for="user">Username:</label>
-	<input id="username" name="user" type="text"/>
-	<input id="connect" type='button' value='connect'/>
+	<input id="username" name="user" type="text" />
+	<input id="connect" type='button' value='connect' />
 	<br/>
 	<label for="message">Message:</label>
-	<input id="message" name="message" type="text"/>
+	<input id="message" name="message" type="text" />
 	<input id="send" type="button" value="send" />
-	
-	<textarea id="chat" rows="20" cols="40" readonly> </textarea>
+
+	<div id="chat">
+	</div>
 </body>
+
 </html>
